@@ -1,5 +1,7 @@
 import express from "express";
 import "dotenv/config";
+import fs from "fs";
+import path from "path";
 import authRoute from "./routes/authRoute.js";
 import messageRoute from "./routes/messageRoute.js";
 import { clerkMiddleware } from "@clerk/express";
@@ -16,7 +18,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(clerkMiddleware());
 
-app.get("/", (req, res) => {
+// Serve frontend on product
+const publicDir = path.join(process.cwd(), "public");
+if (fs.existsSync(publicDir)) {
+  app.use(express.static(publicDir));
+
+  app.get("/{*any}", (req, res, next) => {
+    res.sendFile(path.join(publicDir, "index.html"), (err) => next(err));
+  });
+}
+
+app.get("/health", (req, res) => {
   res.send("Hello");
 });
 
