@@ -5,6 +5,7 @@ import path from "path";
 import authRoute from "./routes/authRoute.js";
 import messageRoute from "./routes/messageRoute.js";
 import { clerkMiddleware } from "@clerk/express";
+import clerkWebhook from "./webhooks/clerkWebhook.js";
 import cors from "cors";
 
 const app = express();
@@ -13,6 +14,12 @@ const app = express();
 app.set("port", process.env.PORT || "3000");
 
 // Middlewares
+app.post(
+  "/api/webhooks/clerk",
+  express.raw({ type: "application/json" }),
+  clerkWebhook,
+);
+
 app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
